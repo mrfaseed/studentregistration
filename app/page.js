@@ -748,7 +748,7 @@ export default function RegistrationPage() {
                       id="address"
                       name="address"
                       autoComplete="street-address"
-                      placeholder="e.g. 123 Main Street, Colombo 03, Sri Lanka"
+                      placeholder="Enter your address"
                       className={`form-input form-textarea${errors.address ? " error" : ""}`}
                       value={fields.address}
                       onChange={handleChange}
