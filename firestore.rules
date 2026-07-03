@@ -1,0 +1,29 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ── ADMIN COLLECTION ──────────────────────────────────────────
+    // Allow reading admin docs for login verification.
+    // Completely deny writes/edits from the client to prevent admin takeover.
+    match /admin/{adminId} {
+      allow read: if true;
+      allow write: if false;
+    }
+    
+    // ── STUDENTS COLLECTION ───────────────────────────────────────
+    match /students/{studentId} {
+      // Allow reading registration details
+      allow read: if true;
+      
+      // Allow initial student registration
+      allow create: if true;
+      
+      // Enforce ONE-TIME EDIT rule at the database level:
+      // A student can only update if their existing record has NOT been locked yet (hasEdited != true).
+      allow update: if resource.data.hasEdited != true;
+      
+      // Do not allow deleting student records from client
+      allow delete: if false;
+    }
+  }
+}
