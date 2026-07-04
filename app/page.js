@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { db } from "@/lib/firebase";
 import { collection, addDoc, updateDoc, doc, serverTimestamp, query, where, getDocs } from "firebase/firestore";
 
@@ -8,52 +8,193 @@ import { collection, addDoc, updateDoc, doc, serverTimestamp, query, where, getD
 // ── SVG Icons (accepting className and style to prevent absolute positioning in dashboard) ──
 const UserIcon = ({ style, className = "input-icon" }) => (
   <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-    <circle cx="12" cy="7" r="4"/>
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+    <circle cx="12" cy="7" r="4" />
   </svg>
 );
 
 const MailIcon = ({ style, className = "input-icon" }) => (
   <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="2" y="4" width="20" height="16" rx="2"/>
-    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+    <rect x="2" y="4" width="20" height="16" rx="2" />
+    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
   </svg>
 );
 
 const PhoneIcon = ({ style, className = "input-icon" }) => (
   <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.3h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l.92-.91a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.3h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l.92-.91a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
   </svg>
 );
 
 const MapPinIcon = ({ style, className = "input-icon input-icon-textarea" }) => (
   <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/>
-    <circle cx="12" cy="10" r="3"/>
+    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z" />
+    <circle cx="12" cy="10" r="3" />
   </svg>
 );
 
 const AlertIcon = () => (
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="10"/>
-    <line x1="12" y1="8" x2="12" y2="12"/>
-    <line x1="12" y1="16" x2="12.01" y2="16"/>
+    <circle cx="12" cy="12" r="10" />
+    <line x1="12" y1="8" x2="12" y2="12" />
+    <line x1="12" y1="16" x2="12.01" y2="16" />
   </svg>
 );
 
 const ArrowRightIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="5" y1="12" x2="19" y2="12"/>
-    <polyline points="12 5 19 12 12 19"/>
+    <line x1="5" y1="12" x2="19" y2="12" />
+    <polyline points="12 5 19 12 12 19" />
   </svg>
 );
 
 const EditIcon = () => (
   <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
-    <path d="m15 5 4 4"/>
+    <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+    <path d="m15 5 4 4" />
   </svg>
 );
+
+// Extra icons (no emojis anywhere)
+const CheckIcon = ({ size = 20 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="20 6 9 17 4 12" />
+  </svg>
+);
+
+const WarningIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+    <line x1="12" y1="9" x2="12" y2="13" />
+    <line x1="12" y1="17" x2="12.01" y2="17" />
+  </svg>
+);
+
+const LockIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+  </svg>
+);
+
+// ── Professional & Elegant White Theme Loading Screen ──
+function AppLoadingScreen() {
+  return (
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 9999,
+      backgroundColor: "#ffffff",
+      backgroundImage: "radial-gradient(#e5e7eb 1px, transparent 1px)",
+      backgroundSize: "24px 24px",
+      display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+      fontFamily: "var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    }}>
+      {/* Subtle radial white overlay in center for clean text readability against the grid */}
+      <div style={{
+        position: "absolute",
+        width: "650px", height: "650px",
+        background: "radial-gradient(circle, rgba(255,255,255,1) 35%, rgba(255,255,255,0.85) 65%, rgba(255,255,255,0) 100%)",
+        pointerEvents: "none",
+      }} />
+
+      {/* Content Container */}
+      <div style={{
+        position: "relative", zIndex: 1,
+        display: "flex", flexDirection: "column", alignItems: "center",
+        animation: "loadingFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
+      }}>
+        {/* Refined Minimalist Logo Card */}
+        <div style={{
+          width: "68px", height: "68px",
+          borderRadius: "20px",
+          background: "#ffffff",
+          border: "1px solid rgba(0, 0, 0, 0.06)",
+          boxShadow: "0 14px 34px -10px rgba(0, 0, 0, 0.08), 0 4px 14px -4px rgba(0, 0, 0, 0.03)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          marginBottom: "24px",
+          animation: "loadingFloat 3.2s ease-in-out infinite",
+        }}>
+          <div style={{
+            width: "44px", height: "44px",
+            borderRadius: "12px",
+            background: "#0f172a",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            color: "#ffffff",
+            boxShadow: "0 4px 10px rgba(15, 23, 42, 0.15)",
+          }}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+              <path d="M6 12v5c3 3 9 3 12 0v-5" />
+            </svg>
+          </div>
+        </div>
+
+        {/* Title */}
+        <h1 style={{
+          fontSize: "20px", fontWeight: 700, color: "#0f172a",
+          letterSpacing: "-0.025em", margin: "0 0 6px 0",
+          textAlign: "center",
+        }}>
+          Student Registration
+        </h1>
+
+        {/* Status indicator pill */}
+        <div style={{
+          display: "flex", alignItems: "center", gap: "7px",
+          margin: "0 0 32px 0", padding: "4px 12px",
+          background: "#f8fafc", border: "1px solid #e2e8f0",
+          borderRadius: "999px",
+        }}>
+          <span style={{
+            width: "6px", height: "6px", borderRadius: "50%",
+            background: "#3b82f6", display: "inline-block",
+            animation: "loadingPulseDot 1.5s infinite ease-in-out",
+          }} />
+          <span style={{
+            fontSize: "12px", color: "#64748b", fontWeight: 500,
+            letterSpacing: "-0.005em",
+          }}>
+            Initializing...
+          </span>
+        </div>
+
+        {/* Sleek Minimalist Progress Bar */}
+        <div style={{
+          width: "160px", height: "2px",
+          background: "#f1f5f9",
+          borderRadius: "999px", overflow: "hidden",
+          position: "relative",
+        }}>
+          <div style={{
+            position: "absolute", top: 0, bottom: 0,
+            width: "45%",
+            background: "linear-gradient(90deg, transparent, #0f172a, transparent)",
+            borderRadius: "999px",
+            animation: "loadingSlide 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite",
+          }} />
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes loadingFadeIn {
+          from { opacity: 0; transform: translateY(12px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes loadingFloat {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-5px); }
+        }
+        @keyframes loadingPulseDot {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.4; transform: scale(0.85); }
+        }
+        @keyframes loadingSlide {
+          0% { left: -45%; }
+          100% { left: 100%; }
+        }
+      `}</style>
+    </div>
+  );
+}
 
 // ── Helpers ─────────────────────────────────────────────
 function getFullEmail(fields) {
@@ -129,7 +270,7 @@ function AnimatedPhoneDisplay({ value, focused }) {
     <div style={{ display: "flex", alignItems: "center", height: "24px", fontSize: "16px", fontWeight: 600, color: "var(--color-text-primary)", fontFamily: "monospace", letterSpacing: "1.5px" }}>
       {displaySlots.length === 0 ? (
         <span style={{ color: "var(--color-text-muted)", fontFamily: "var(--font-inter), sans-serif", fontSize: "15px", fontWeight: 400, letterSpacing: "normal" }}>
-          98765 43210
+
         </span>
       ) : (
         displaySlots.map((item) => (
@@ -192,6 +333,7 @@ export default function RegistrationPage() {
     address: "",
   });
   const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
   const [submitted, setSubmitted] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [hasEdited, setHasEdited] = useState(false);
@@ -199,7 +341,20 @@ export default function RegistrationPage() {
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [phoneFocused, setPhoneFocused] = useState(false);
+  const [emailFocused, setEmailFocused] = useState(false);
   const [updateSuccess, setUpdateSuccess] = useState(false);
+  // App-init loading screen
+  const [appLoading, setAppLoading] = useState(true);
+
+  const addressRef = useRef(null);
+
+  // Auto-expand address textarea without scrollbars or manual resize
+  useEffect(() => {
+    if (addressRef.current) {
+      addressRef.current.style.height = "auto";
+      addressRef.current.style.height = `${addressRef.current.scrollHeight}px`;
+    }
+  }, [fields.address]);
 
   // Check localStorage on mount for existing registration
   useEffect(() => {
@@ -219,6 +374,9 @@ export default function RegistrationPage() {
         console.error("Failed to load saved registration:", err);
       }
     }
+    // Minimum 1.4s so the loading screen is always visible
+    const minDelay = setTimeout(() => setAppLoading(false), 1400);
+    return () => clearTimeout(minDelay);
   }, []);
 
   function populateFieldsFromData(data) {
@@ -244,48 +402,46 @@ export default function RegistrationPage() {
 
   function handleChange(e) {
     const { name, value } = e.target;
-    setFields((prev) => ({ ...prev, [name]: value }));
-
-    if (errors[name] || (name.startsWith("email") && errors.email)) {
-      setErrors((prev) => {
-        const next = { ...prev };
-        delete next[name];
-        delete next.email;
-        return next;
-      });
-    }
+    setFields((prev) => {
+      const next = { ...prev, [name]: value };
+      const currentErrors = validate(next);
+      setErrors(currentErrors);
+      return next;
+    });
+    setTouched((prev) => ({
+      ...prev,
+      [name]: true,
+      ...(name.startsWith("email") ? { email: true } : {}),
+    }));
     setSubmitError("");
   }
 
   function handlePhoneChange(e) {
     const raw = e.target.value.replace(/\D/g, "");
-    if (raw.length > 0) {
-      const firstChar = raw[0];
-      if (!["6", "7", "8", "9"].includes(firstChar)) {
-        setErrors((prev) => ({
-          ...prev,
-          phone: "Mobile number must start with 6, 7, 8, or 9.",
-        }));
-        if (raw.length === 1) return;
-      } else {
-        setErrors((prev) => {
-          const next = { ...prev };
-          delete next.phone;
-          return next;
-        });
-      }
-    } else {
-      setErrors((prev) => {
-        const next = { ...prev };
-        delete next.phone;
-        return next;
-      });
-    }
-    setFields((prev) => ({ ...prev, phone: raw.slice(0, 10) }));
+    const cleanPhone = raw.slice(0, 10);
+    setFields((prev) => {
+      const next = { ...prev, phone: cleanPhone };
+      const currentErrors = validate(next);
+      setErrors(currentErrors);
+      return next;
+    });
+    setTouched((prev) => ({ ...prev, phone: true }));
+    setSubmitError("");
+  }
+
+  function handleBlur(e) {
+    const { name } = e.target;
+    setTouched((prev) => ({
+      ...prev,
+      [name]: true,
+      ...(name.startsWith("email") ? { email: true } : {}),
+    }));
+    setErrors(validate(fields));
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
+    setSubmitted(true);
     const validationErrors = validate(fields);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
@@ -368,12 +524,23 @@ export default function RegistrationPage() {
   const hasAt = (fields.emailUser || "").includes("@");
   const liveEmail = getFullEmail(fields);
 
+  function getFieldStatus(fieldName, val) {
+    const isTouched = touched[fieldName] || submitted;
+    if (!isTouched) return "default";
+    if (errors[fieldName]) return "error";
+    if (val?.trim()) return "success";
+    return "default";
+  }
+
+  // Show full-page loading screen on first paint
+  if (appLoading) return <AppLoadingScreen />;
+
   return (
     <>
       {/* Navbar with properly aligned logo */}
       <nav className="navbar">
         <a href="/" className="navbar-brand">
-          
+
           <span className="navbar-title" style={{ fontSize: "18px", fontWeight: 800, color: "#111827", letterSpacing: "-0.02em" }}>Student Registration</span>
         </a>
       </nav>
@@ -385,8 +552,8 @@ export default function RegistrationPage() {
             /* ── Read-Only Registered Student Dashboard / Finished Form ── */
             <div style={{ padding: "32px 36px" }}>
               {updateSuccess && (
-                <div style={{ display: "flex", alignItems: "center", gap: "8px", background: "#ecfdf5", border: "1px solid #10b981", color: "#065f46", padding: "12px 16px", borderRadius: "10px", marginBottom: "22px", fontSize: "14px", fontWeight: 600, animation: "fadeIn .3s ease" }}>
-                  <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#10b981" }} />
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", background: "#ecfdf5", border: "1px solid #10b981", color: "#065f46", padding: "12px 16px", borderRadius: "10px", marginBottom: "22px", fontSize: "14px", fontWeight: 600 }}>
+                  <CheckIcon size={16} />
                   Registration information updated successfully!
                 </div>
               )}
@@ -473,6 +640,7 @@ export default function RegistrationPage() {
               {/* Confirm or Edit Buttons / Locked Notice */}
               {hasEdited ? (
                 <div style={{ background: "#f3f4f6", border: "1px solid #e5e7eb", borderRadius: "12px", padding: "14px 18px", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", color: "#4b5563", fontSize: "14px", fontWeight: 600, textAlign: "center" }}>
+                  <LockIcon />
                   <span>Registration Completed</span>
                 </div>
               ) : (
@@ -506,11 +674,8 @@ export default function RegistrationPage() {
                       transition: "all 0.2s ease",
                     }}
                   >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                      <polyline points="22 4 12 14.01 9 11.01"/>
-                    </svg>
-                    Confirm Registration Details ✓
+                    <CheckIcon size={20} />
+                    Confirm Registration Details
                   </button>
 
                   <button
@@ -545,8 +710,9 @@ export default function RegistrationPage() {
             <>
               <div className="form-card-header">
                 <h2>{isEditing ? "Edit Registration Details" : "Student Information"}</h2>
-                <p style={{ color: isEditing ? "#d97706" : "inherit", fontWeight: isEditing ? 600 : "normal" }}>
-                  {isEditing ? "⚠ Note: You can only update and confirm your details once." : "Fill in the details below to complete your registration."}
+                <p style={{ color: isEditing ? "#d97706" : "inherit", fontWeight: isEditing ? 600 : "normal", display: "flex", alignItems: "center", gap: "6px" }}>
+                  {isEditing && <WarningIcon />}
+                  {isEditing ? "Note: You can only update and confirm your details once." : "Fill in the details below to complete your registration."}
                 </p>
               </div>
               <form className="form-body" onSubmit={handleSubmit} noValidate>
@@ -557,122 +723,121 @@ export default function RegistrationPage() {
                   </label>
                   <div className="input-wrapper">
                     <UserIcon />
-                    <input
-                      id="name"
-                      name="name"
-                      type="text"
-                      autoComplete="name"
-                      placeholder="Enter Your Name"
-                      className={`form-input${errors.name ? " error" : ""}`}
-                      value={fields.name}
-                      onChange={handleChange}
-                    />
+                    {(() => {
+                      const nameStatus = getFieldStatus("name", fields.name);
+                      return (
+                        <input
+                          id="name"
+                          name="name"
+                          type="text"
+                          autoComplete="name"
+                          placeholder="Enter Your Name"
+                          className={`form-input${nameStatus === "error" ? " error" : nameStatus === "success" ? " success" : ""}`}
+                          value={fields.name}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                        />
+                      );
+                    })()}
                   </div>
-                  {errors.name && (
+                  {(touched.name || submitted) && errors.name && (
                     <p className="error-msg"><AlertIcon /> {errors.name}</p>
                   )}
                 </div>
 
-                {/* Email with animated collapsible domain box */}
+                {/* Email with fixed suffix badge */}
                 <div className="input-group">
                   <label className="input-label" htmlFor="emailUser">
                     Email Address <span>*</span>
                   </label>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "stretch",
-                      border: errors.email ? "1.5px solid var(--color-danger)" : "1.5px solid var(--color-border)",
-                      borderRadius: "var(--radius-md)",
-                      background: "var(--color-bg)",
-                      overflow: "hidden",
-                      transition: "all var(--transition-base)",
-                    }}
-                    onFocus={(e) => {
-                      e.currentTarget.style.borderColor = "var(--color-primary)";
-                      e.currentTarget.style.boxShadow = "0 0 0 3px rgba(99,102,241,.12)";
-                      e.currentTarget.style.background = "#fff";
-                    }}
-                    onBlur={(e) => {
-                      e.currentTarget.style.borderColor = errors.email ? "var(--color-danger)" : "var(--color-border)";
-                      e.currentTarget.style.boxShadow = "none";
-                      e.currentTarget.style.background = "var(--color-bg)";
-                    }}
-                  >
-                    <div style={{ display: "flex", alignItems: "center", paddingLeft: "14px", color: "var(--color-text-muted)", pointerEvents: "none" }}>
-                      <MailIcon style={{ position: "static", transform: "none", width: "18px", height: "18px" }} />
-                    </div>
-                    <input
-                      id="emailUser"
-                      name="emailUser"
-                      type="text"
-                      autoComplete="username"
-                      placeholder={hasAt ? "e.g. name@gmail.com" : "username"}
-                      style={{
-                        border: "none",
-                        background: "transparent",
-                        padding: "12px 10px 12px 10px",
-                        flex: 1,
-                        outline: "none",
-                        fontSize: "15px",
-                        fontFamily: "inherit",
-                        color: "var(--color-text-primary)",
-                        minWidth: "120px",
-                      }}
-                      value={fields.emailUser}
-                      onChange={handleChange}
-                    />
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        background: "#f3f4f6",
-                        borderLeft: hasAt ? "none" : "1px solid #e5e7eb",
-                        maxWidth: hasAt ? "0px" : "150px",
-                        opacity: hasAt ? 0 : 1,
-                        overflow: "hidden",
-                        transition: "max-width 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, border-left 0.25s ease",
-                        padding: hasAt ? "0" : "0 4px",
-                        pointerEvents: hasAt ? "none" : "auto",
-                      }}
-                    >
-                      <input
-                        id="emailDomain"
-                        name="emailDomain"
-                        list="domain-options"
-                        type="text"
-                        placeholder="@gmail.com"
+                  {(() => {
+                    const emailStatus = getFieldStatus("email", fields.emailUser);
+                    const emailBorder = emailStatus === "error" ? "var(--color-danger)" : emailStatus === "success" ? "var(--color-success)" : emailFocused ? "var(--color-primary)" : "var(--color-border)";
+                    const emailBg = emailStatus === "error" ? "#fff5f5" : emailStatus === "success" ? "#f0fdf4" : emailFocused ? "#fff" : "var(--color-bg)";
+                    const emailShadow = emailStatus === "error" && emailFocused ? "0 0 0 3px rgba(239, 68, 68, .12)" : emailStatus === "success" && emailFocused ? "0 0 0 3px rgba(16, 185, 129, .15)" : emailFocused ? "0 0 0 3px rgba(99,102,241,.12)" : "none";
+                    return (
+                      <div
                         style={{
-                          border: "none",
-                          background: "transparent",
-                          padding: "12px 10px",
-                          width: "135px",
-                          outline: "none",
-                          fontSize: "14.5px",
-                          fontWeight: 600,
-                          color: "#374151",
-                          fontFamily: "inherit",
+                          display: "flex",
+                          alignItems: "stretch",
+                          minHeight: "54px",
+                          border: `1.5px solid ${emailBorder}`,
+                          borderRadius: "var(--radius-md)",
+                          background: emailBg,
+                          boxShadow: emailShadow,
+                          overflow: "hidden",
+                          transition: "all var(--transition-base)",
                         }}
-                        value={fields.emailDomain}
-                        onChange={handleChange}
-                        tabIndex={hasAt ? -1 : 0}
-                      />
-                      <datalist id="domain-options">
-                        <option value="@gmail.com" />
-                        <option value="@yahoo.com" />
-                        <option value="@outlook.com" />
-                        <option value="@hotmail.com" />
-                        <option value="@icloud.com" />
-                      </datalist>
-                    </div>
-                  </div>
+                        onClick={() => document.getElementById("emailUser")?.focus()}
+                      >
+                        <div style={{ display: "flex", alignItems: "center", paddingLeft: "16px", color: "var(--color-text-muted)", pointerEvents: "none" }}>
+                          <MailIcon style={{ position: "static", transform: "none", width: "18px", height: "18px" }} />
+                        </div>
+                        <input
+                          id="emailUser"
+                          name="emailUser"
+                          type="email"
+                          inputMode="email"
+                          autoComplete="email"
+                          placeholder={hasAt ? "e.g. name@gmail.com" : "username"}
+                          style={{
+                            border: "none",
+                            background: "transparent",
+                            padding: "14px 12px",
+                            flex: 1,
+                            outline: "none",
+                            fontSize: "16px",
+                            fontFamily: "inherit",
+                            color: "var(--color-text-primary)",
+                            minWidth: "120px",
+                          }}
+                          value={fields.emailUser}
+                          onChange={handleChange}
+                          onFocus={() => setEmailFocused(true)}
+                          onBlur={(e) => {
+                            setEmailFocused(false);
+                            handleBlur(e);
+                          }}
+                        />
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            background: "#e2e8f0",
+                            borderLeft: hasAt ? "none" : "1px solid #cbd5e1",
+                            maxWidth: hasAt ? "0px" : "130px",
+                            opacity: hasAt ? 0 : 1,
+                            overflow: "hidden",
+                            transition: "max-width 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, border-left 0.25s ease",
+                            padding: hasAt ? "0" : "0 16px",
+                            pointerEvents: "none",
+                            userSelect: "none",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          <span
+                            style={{
+                              fontSize: "13.5px",
+                              fontWeight: 600,
+                              color: "#475569",
+                              fontFamily: "inherit",
+                              letterSpacing: "0.01em",
+                            }}
+                          >
+                            @gmail.com
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })()}
                   {fields.emailUser && !errors.email && (
                     <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "6px", fontSize: "12px", color: "var(--color-primary-dark)", animation: "fadeIn .2s ease" }}>
-                      <span style={{ display: "inline-block", width: "6px", height: "6px", borderRadius: "50%", background: "var(--color-primary)" }}/>
+                      <span style={{ display: "inline-block", width: "6px", height: "6px", borderRadius: "50%", background: "var(--color-primary)" }} />
                       <span>Full email: <strong style={{ fontWeight: 600 }}>{liveEmail}</strong></span>
                     </div>
                   )}
-                  {errors.email && (
+                  {(touched.email || submitted) && errors.email && (
                     <p className="error-msg"><AlertIcon /> {errors.email}</p>
                   )}
                 </div>
@@ -682,57 +847,71 @@ export default function RegistrationPage() {
                   <label className="input-label" htmlFor="phone-hidden-input">
                     Mobile Number <span>*</span>
                   </label>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "stretch",
-                      border: errors.phone ? "1.5px solid var(--color-danger)" : phoneFocused ? "1.5px solid var(--color-primary)" : "1.5px solid var(--color-border)",
-                      borderRadius: "var(--radius-md)",
-                      background: phoneFocused ? "#fff" : "var(--color-bg)",
-                      boxShadow: phoneFocused ? "0 0 0 3px rgba(99,102,241,.12)" : "none",
-                      overflow: "hidden",
-                      transition: "all var(--transition-base)",
-                      position: "relative",
-                      cursor: "text",
-                    }}
-                    onClick={() => document.getElementById("phone-hidden-input")?.focus()}
-                  >
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px", padding: "0 14px", background: "#f3f4f6", borderRight: "1px solid #e5e7eb", color: "#374151", fontWeight: 700, fontSize: "14.5px", userSelect: "none", zIndex: 2 }}>
-                      <PhoneIcon style={{ position: "static", transform: "none", width: "16px", height: "16px", color: "var(--color-text-secondary)" }} />
-                      <span>+91</span>
-                    </div>
+                  {(() => {
+                    const phoneStatus = getFieldStatus("phone", fields.phone);
+                    const phoneBorder = phoneStatus === "error" ? "var(--color-danger)" : phoneStatus === "success" ? "var(--color-success)" : phoneFocused ? "var(--color-primary)" : "var(--color-border)";
+                    const phoneBg = phoneStatus === "error" ? "#fff5f5" : phoneStatus === "success" ? "#f0fdf4" : phoneFocused ? "#fff" : "var(--color-bg)";
+                    const phoneShadow = phoneStatus === "error" && phoneFocused ? "0 0 0 3px rgba(239, 68, 68, .12)" : phoneStatus === "success" && phoneFocused ? "0 0 0 3px rgba(16, 185, 129, .15)" : phoneFocused ? "0 0 0 3px rgba(99,102,241,.12)" : "none";
+                    return (
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "stretch",
+                          minHeight: "54px",
+                          border: `1.5px solid ${phoneBorder}`,
+                          borderRadius: "var(--radius-md)",
+                          background: phoneBg,
+                          boxShadow: phoneShadow,
+                          overflow: "hidden",
+                          transition: "all var(--transition-base)",
+                          position: "relative",
+                          cursor: "text",
+                        }}
+                        onClick={() => document.getElementById("phone-hidden-input")?.focus()}
+                      >
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px", padding: "0 16px", background: "#f3f4f6", borderRight: "1px solid #e5e7eb", color: "#374151", fontWeight: 700, fontSize: "15px", userSelect: "none", zIndex: 2 }}>
+                          <PhoneIcon style={{ position: "static", transform: "none", width: "16px", height: "16px", color: "var(--color-text-secondary)" }} />
+                          <span>+91</span>
+                        </div>
 
-                    <div style={{ flex: 1, display: "flex", alignItems: "center", padding: "12px 14px", overflow: "hidden", minHeight: "46px", zIndex: 1, pointerEvents: "none" }}>
-                      <AnimatedPhoneDisplay value={fields.phone} focused={phoneFocused} />
-                    </div>
+                        <div style={{ flex: 1, display: "flex", alignItems: "center", padding: "14px 16px", overflow: "hidden", minHeight: "54px", zIndex: 1, pointerEvents: "none" }}>
+                          <AnimatedPhoneDisplay value={fields.phone} focused={phoneFocused} />
+                        </div>
 
-                    <input
-                      id="phone-hidden-input"
-                      name="phone"
-                      type="tel"
-                      autoComplete="tel"
-                      value={fields.phone}
-                      onChange={handlePhoneChange}
-                      onFocus={() => setPhoneFocused(true)}
-                      onBlur={() => setPhoneFocused(false)}
-                      style={{
-                        position: "absolute",
-                        opacity: 0,
-                        inset: 0,
-                        width: "100%",
-                        height: "100%",
-                        cursor: "text",
-                        zIndex: 3,
-                      }}
-                    />
-                  </div>
+                        <input
+                          id="phone-hidden-input"
+                          name="phone"
+                          type="tel"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          autoComplete="tel"
+                          value={fields.phone}
+                          onChange={handlePhoneChange}
+                          onFocus={() => setPhoneFocused(true)}
+                          onBlur={(e) => {
+                            setPhoneFocused(false);
+                            handleBlur(e);
+                          }}
+                          style={{
+                            position: "absolute",
+                            opacity: 0,
+                            inset: 0,
+                            width: "100%",
+                            height: "100%",
+                            cursor: "text",
+                            zIndex: 3,
+                          }}
+                        />
+                      </div>
+                    );
+                  })()}
                   {fields.phone && !errors.phone && (
                     <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "6px", fontSize: "12px", color: "var(--color-text-secondary)", animation: "fadeIn .2s ease" }}>
-                      <span style={{ display: "inline-block", width: "6px", height: "6px", borderRadius: "50%", background: "var(--color-success)" }}/>
+                      <span style={{ display: "inline-block", width: "6px", height: "6px", borderRadius: "50%", background: "var(--color-success)" }} />
                       <span>Will be contacted at: <strong style={{ fontWeight: 600, color: "var(--color-text-primary)" }}>+91 {fields.phone.trim().replace(/^\+91\s*/i, "")}</strong></span>
                     </div>
                   )}
-                  {errors.phone && (
+                  {(touched.phone || submitted) && errors.phone && (
                     <p className="error-msg"><AlertIcon /> {errors.phone}</p>
                   )}
                 </div>
@@ -744,18 +923,25 @@ export default function RegistrationPage() {
                   </label>
                   <div className="input-wrapper">
                     <MapPinIcon />
-                    <textarea
-                      id="address"
-                      name="address"
-                      autoComplete="street-address"
-                      placeholder="Enter your address"
-                      className={`form-input form-textarea${errors.address ? " error" : ""}`}
-                      value={fields.address}
-                      onChange={handleChange}
-                      rows={3}
-                    />
+                    {(() => {
+                      const addressStatus = getFieldStatus("address", fields.address);
+                      return (
+                        <textarea
+                          id="address"
+                          ref={addressRef}
+                          name="address"
+                          autoComplete="street-address"
+                          placeholder="Enter your address"
+                          className={`form-input form-textarea${addressStatus === "error" ? " error" : addressStatus === "success" ? " success" : ""}`}
+                          value={fields.address}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          rows={2}
+                        />
+                      );
+                    })()}
                   </div>
-                  {errors.address && (
+                  {(touched.address || submitted) && errors.address && (
                     <p className="error-msg"><AlertIcon /> {errors.address}</p>
                   )}
                 </div>
@@ -775,7 +961,7 @@ export default function RegistrationPage() {
                         if (savedData) {
                           try {
                             populateFieldsFromData(JSON.parse(savedData));
-                          } catch (e) {}
+                          } catch (e) { }
                         }
                         setIsEditing(false);
                         setErrors({});
@@ -783,12 +969,13 @@ export default function RegistrationPage() {
                       }}
                       style={{
                         flex: 1,
-                        padding: "14px",
+                        minHeight: "54px",
+                        padding: "14px 18px",
                         background: "#f3f4f6",
                         color: "#374151",
                         border: "1px solid #d1d5db",
                         borderRadius: "12px",
-                        fontSize: "14.5px",
+                        fontSize: "16px",
                         fontWeight: 700,
                         cursor: "pointer",
                         display: "flex",
@@ -803,12 +990,13 @@ export default function RegistrationPage() {
                       disabled={loading}
                       style={{
                         flex: 2,
-                        padding: "14px",
+                        minHeight: "54px",
+                        padding: "14px 18px",
                         background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
                         color: "#fff",
                         border: "none",
                         borderRadius: "12px",
-                        fontSize: "14.5px",
+                        fontSize: "16px",
                         fontWeight: 700,
                         cursor: "pointer",
                         display: "flex",
@@ -818,7 +1006,11 @@ export default function RegistrationPage() {
                         boxShadow: "0 4px 14px rgba(16, 185, 129, 0.3)",
                       }}
                     >
-                      {loading ? <><span className="spinner" /> Confirming…</> : "Confirm & Lock Information ✓"}
+                      {loading ? (
+                        <><span className="spinner" />{" "}Confirming…</>
+                      ) : (
+                        <><CheckIcon size={16} /> Confirm &amp; Lock Information</>
+                      )}
                     </button>
                   </div>
                 ) : (
@@ -841,6 +1033,10 @@ export default function RegistrationPage() {
       </main>
 
       <style jsx global>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to   { opacity: 1; }
+        }
         @keyframes digitSlideUp {
           0% {
             transform: translateY(14px);
