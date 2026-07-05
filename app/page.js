@@ -364,9 +364,9 @@ function ConfirmationDialog({ open, fields, loading, submitError, onEdit, onConf
   const fullEmail = getFullEmail(fields);
   const rows = [
     { icon: <UserIcon className="" style={{ width: "18px", height: "18px", position: "static", transform: "none" }} />, bg: "#ecfdf5", color: "#059669", label: "Full Name", value: fields.name, mono: false },
-    { icon: <MailIcon className="" style={{ width: "18px", height: "18px", position: "static", transform: "none" }} />, bg: "#f0fdfa", color: "#0d9488", label: "Email Address", value: fullEmail, mono: false },
-    { icon: <PhoneIcon className="" style={{ width: "18px", height: "18px", position: "static", transform: "none" }} />, bg: "#f0fdf4", color: "#16a34a", label: "Mobile Number", value: `+91 ${fields.phone}`, mono: true },
-    { icon: <MapPinIcon className="" style={{ width: "18px", height: "18px", position: "static", transform: "none" }} />, bg: "#fef3c7", color: "#d97706", label: "Residential Address", value: fields.address, mono: false },
+    { icon: <MailIcon className="" style={{ width: "18px", height: "18px", position: "static", transform: "none" }} />, bg: "#ecfeff", color: "#0891b2", label: "Email Address", value: fullEmail, mono: false },
+    { icon: <PhoneIcon className="" style={{ width: "18px", height: "18px", position: "static", transform: "none" }} />, bg: "#fef3c7", color: "#d97706", label: "Mobile Number", value: `+91 ${fields.phone}`, mono: true },
+    { icon: <MapPinIcon className="" style={{ width: "18px", height: "18px", position: "static", transform: "none" }} />, bg: "#fff1f2", color: "#e11d48", label: "Residential Address", value: fields.address, mono: false },
   ];
 
   return (
@@ -863,7 +863,7 @@ export default function RegistrationPage() {
 
                 <div style={{ background: "#f8fafc", border: "1px solid #e5e7eb", borderRadius: "12px", padding: "15px 18px", display: "flex", alignItems: "center", justify: "space-between" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-                    <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "#fef3c7", color: "#d97706", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "#fff1f2", color: "#e11d48", display: "flex", alignItems: "center", justifyContent: "center" }}>
                       <MapPinIcon className="" style={{ width: "18px", height: "18px", position: "static", transform: "none" }} />
                     </div>
                     <div>
@@ -894,27 +894,49 @@ export default function RegistrationPage() {
                     <span>Registration Progress</span>
                     <span style={{ color: progressPercent === 100 ? "var(--color-success)" : "var(--color-primary)", transition: "color 0.3s ease" }}>{progressPercent}%</span>
                   </div>
-                  <div style={{ height: "6px", width: "100%", background: "#e2e8f0", borderRadius: "999px", overflow: "hidden" }}>
+                  <div style={{ height: "8px", width: "100%", background: "#e2e8f0", borderRadius: "999px", overflow: "hidden", boxShadow: "inset 0 1px 2px rgba(0,0,0,0.1)" }}>
                     <div
                       style={{
                         height: "100%",
                         width: `${progressPercent}%`,
-                        background: progressPercent === 100 ? "linear-gradient(90deg, #10b981, #059669)" : "linear-gradient(90deg, #34d399, #059669)",
+                        background: progressPercent === 100 ? "linear-gradient(90deg, #10b981, #06b6d4, #f59e0b, #f43f5e)" : "linear-gradient(90deg, #10b981, #06b6d4, #f59e0b)",
                         transition: "width 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.4s ease",
                         borderRadius: "999px",
                       }}
                     />
+                  </div>
+                  {/* Colorful Step Pills */}
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "8px", marginTop: "14px" }}>
+                    <div style={{ padding: "6px 8px", borderRadius: "8px", background: fields.name ? "#ecfdf5" : "#f1f5f9", border: `1px solid ${fields.name ? "#a7f3d0" : "#e2e8f0"}`, color: fields.name ? "#059669" : "#64748b", fontSize: "11.5px", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: "5px", transition: "all 0.3s ease" }}>
+                      <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: fields.name ? "#10b981" : "#cbd5e1" }} />
+                      Name {fields.name && "✓"}
+                    </div>
+                    <div style={{ padding: "6px 8px", borderRadius: "8px", background: fields.emailUser ? "#ecfeff" : "#f1f5f9", border: `1px solid ${fields.emailUser ? "#a5f3fc" : "#e2e8f0"}`, color: fields.emailUser ? "#0891b2" : "#64748b", fontSize: "11.5px", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: "5px", transition: "all 0.3s ease" }}>
+                      <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: fields.emailUser ? "#06b6d4" : "#cbd5e1" }} />
+                      Email {fields.emailUser && "✓"}
+                    </div>
+                    <div style={{ padding: "6px 8px", borderRadius: "8px", background: fields.phone ? "#fef3c7" : "#f1f5f9", border: `1px solid ${fields.phone ? "#fde68a" : "#e2e8f0"}`, color: fields.phone ? "#d97706" : "#64748b", fontSize: "11.5px", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: "5px", transition: "all 0.3s ease" }}>
+                      <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: fields.phone ? "#f59e0b" : "#cbd5e1" }} />
+                      Mobile {fields.phone && "✓"}
+                    </div>
+                    <div style={{ padding: "6px 8px", borderRadius: "8px", background: fields.address ? "#fff1f2" : "#f1f5f9", border: `1px solid ${fields.address ? "#fecdd3" : "#e2e8f0"}`, color: fields.address ? "#e11d48" : "#64748b", fontSize: "11.5px", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: "5px", transition: "all 0.3s ease" }}>
+                      <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: fields.address ? "#f43f5e" : "#cbd5e1" }} />
+                      Address {fields.address && "✓"}
+                    </div>
                   </div>
                 </div>
               </div>
               <form className="form-body" onSubmit={handleSubmit} noValidate>
                 {/* Name */}
                 <div className="input-group">
-                  <label className="input-label" htmlFor="name">
-                    Full Name <span>*</span>
+                  <label className="input-label" htmlFor="name" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span style={{ display: "inline-block", width: "10px", height: "10px", borderRadius: "50%", background: "#10b981", boxShadow: "0 0 8px rgba(16, 185, 129, 0.6)" }} />
+                    Full Name <span style={{ color: "var(--color-danger)" }}>*</span>
                   </label>
                   <div className="input-wrapper">
-                    <UserIcon />
+                    <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "linear-gradient(135deg, #10b981, #059669)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", boxShadow: "0 4px 10px rgba(16, 185, 129, 0.35)", pointerEvents: "none", zIndex: 2 }}>
+                      <UserIcon style={{ width: "18px", height: "18px", position: "static", transform: "none" }} />
+                    </div>
                     {(() => {
                       const nameStatus = getFieldStatus("name", fields.name);
                       return (
@@ -925,6 +947,12 @@ export default function RegistrationPage() {
                           autoComplete="name"
                           placeholder="Enter Your Name"
                           className={`form-input${nameStatus === "error" ? " error shake" : nameStatus === "success" ? " success" : ""}`}
+                          style={{
+                            paddingLeft: "58px",
+                            borderColor: nameStatus === "success" || fields.name ? "#10b981" : undefined,
+                            background: nameStatus === "error" ? "#fff5f5" : fields.name ? "#f0fdf4" : undefined,
+                            boxShadow: fields.name && !nameStatus ? "0 0 0 3px rgba(16, 185, 129, 0.12)" : undefined,
+                          }}
                           value={fields.name}
                           onChange={handleChange}
                           onBlur={handleBlur}
@@ -946,14 +974,15 @@ export default function RegistrationPage() {
 
                 {/* Email with fixed suffix badge */}
                 <div className="input-group">
-                  <label className="input-label" htmlFor="emailUser">
-                    Email Address <span>*</span>
+                  <label className="input-label" htmlFor="emailUser" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span style={{ display: "inline-block", width: "10px", height: "10px", borderRadius: "50%", background: "#06b6d4", boxShadow: "0 0 8px rgba(6, 182, 212, 0.6)" }} />
+                    Email Address <span style={{ color: "var(--color-danger)" }}>*</span>
                   </label>
                   {(() => {
                     const emailStatus = getFieldStatus("email", fields.emailUser);
-                    const emailBorder = emailStatus === "error" ? "var(--color-danger)" : emailStatus === "success" ? "var(--color-success)" : emailFocused ? "var(--color-primary)" : "var(--color-border)";
-                    const emailBg = emailStatus === "error" ? "#fff5f5" : emailStatus === "success" ? "#f0fdf4" : emailFocused ? "#fff" : "var(--color-bg)";
-                    const emailShadow = emailStatus === "error" && emailFocused ? "0 0 0 3px rgba(239, 68, 68, .12)" : emailStatus === "success" && emailFocused ? "0 0 0 3px rgba(16, 185, 129, .15)" : emailFocused ? "0 0 0 3px rgba(16, 185, 129, .15)" : "none";
+                    const emailBorder = emailStatus === "error" ? "var(--color-danger)" : emailStatus === "success" || fields.emailUser ? "#06b6d4" : emailFocused ? "#0891b2" : "var(--color-border)";
+                    const emailBg = emailStatus === "error" ? "#fff5f5" : emailStatus === "success" || fields.emailUser ? "#ecfeff" : emailFocused ? "#fff" : "var(--color-bg)";
+                    const emailShadow = emailStatus === "error" && emailFocused ? "0 0 0 3px rgba(239, 68, 68, .12)" : (emailStatus === "success" || fields.emailUser) && emailFocused ? "0 0 0 3px rgba(6, 182, 212, .2)" : emailFocused ? "0 0 0 3px rgba(6, 182, 212, .18)" : "none";
                     return (
                       <div
                         className={emailStatus === "error" ? "shake" : ""}
@@ -970,7 +999,7 @@ export default function RegistrationPage() {
                         }}
                         onClick={() => document.getElementById("emailUser")?.focus()}
                       >
-                        <div style={{ display: "flex", alignItems: "center", paddingLeft: "16px", color: "var(--color-text-muted)", pointerEvents: "none" }}>
+                        <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "linear-gradient(135deg, #06b6d4, #0891b2)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", marginLeft: "10px", marginRight: "6px", alignSelf: "center", boxShadow: "0 4px 10px rgba(6, 182, 212, 0.35)", flexShrink: 0 }}>
                           <MailIcon style={{ position: "static", transform: "none", width: "18px", height: "18px" }} />
                         </div>
                         <input
@@ -1011,8 +1040,8 @@ export default function RegistrationPage() {
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            background: "#e2e8f0",
-                            borderLeft: hasAt ? "none" : "1px solid #cbd5e1",
+                            background: "#ecfeff",
+                            borderLeft: hasAt ? "none" : "1px solid #a5f3fc",
                             maxWidth: hasAt ? "0px" : "130px",
                             opacity: hasAt ? 0 : 1,
                             overflow: "hidden",
@@ -1026,8 +1055,8 @@ export default function RegistrationPage() {
                           <span
                             style={{
                               fontSize: "13.5px",
-                              fontWeight: 600,
-                              color: "#475569",
+                              fontWeight: 700,
+                              color: "#0e7490",
                               fontFamily: "inherit",
                               letterSpacing: "0.01em",
                             }}
@@ -1039,8 +1068,8 @@ export default function RegistrationPage() {
                     );
                   })()}
                   {fields.emailUser && !errors.email && (
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "6px", fontSize: "12px", color: "var(--color-primary-dark)", animation: "fadeIn .2s ease" }}>
-                      <span style={{ display: "inline-block", width: "6px", height: "6px", borderRadius: "50%", background: "var(--color-primary)" }} />
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "6px", fontSize: "12px", color: "#0891b2", animation: "fadeIn .2s ease" }}>
+                      <span style={{ display: "inline-block", width: "6px", height: "6px", borderRadius: "50%", background: "#06b6d4" }} />
                       <span>Full email: <strong style={{ fontWeight: 600 }}>{liveEmail}</strong></span>
                     </div>
                   )}
@@ -1051,14 +1080,15 @@ export default function RegistrationPage() {
 
                 {/* Animated Mobile Number Input */}
                 <div className="input-group">
-                  <label className="input-label" htmlFor="phone-hidden-input">
-                    Mobile Number <span>*</span>
+                  <label className="input-label" htmlFor="phone-hidden-input" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span style={{ display: "inline-block", width: "10px", height: "10px", borderRadius: "50%", background: "#f59e0b", boxShadow: "0 0 8px rgba(245, 158, 11, 0.6)" }} />
+                    Mobile Number <span style={{ color: "var(--color-danger)" }}>*</span>
                   </label>
                   {(() => {
                     const phoneStatus = getFieldStatus("phone", fields.phone);
-                    const phoneBorder = phoneStatus === "error" ? "var(--color-danger)" : phoneStatus === "success" ? "var(--color-success)" : phoneFocused ? "var(--color-primary)" : "var(--color-border)";
-                    const phoneBg = phoneStatus === "error" ? "#fff5f5" : phoneStatus === "success" ? "#f0fdf4" : phoneFocused ? "#fff" : "var(--color-bg)";
-                    const phoneShadow = phoneStatus === "error" && phoneFocused ? "0 0 0 3px rgba(239, 68, 68, .12)" : phoneStatus === "success" && phoneFocused ? "0 0 0 3px rgba(16, 185, 129, .15)" : phoneFocused ? "0 0 0 3px rgba(16, 185, 129, .15)" : "none";
+                    const phoneBorder = phoneStatus === "error" ? "var(--color-danger)" : phoneStatus === "success" || fields.phone ? "#f59e0b" : phoneFocused ? "#d97706" : "var(--color-border)";
+                    const phoneBg = phoneStatus === "error" ? "#fff5f5" : phoneStatus === "success" || fields.phone ? "#fffef2" : phoneFocused ? "#fff" : "var(--color-bg)";
+                    const phoneShadow = phoneStatus === "error" && phoneFocused ? "0 0 0 3px rgba(239, 68, 68, .12)" : (phoneStatus === "success" || fields.phone) && phoneFocused ? "0 0 0 3px rgba(245, 158, 11, .2)" : phoneFocused ? "0 0 0 3px rgba(245, 158, 11, .18)" : "none";
                     return (
                       <div
                         className={phoneStatus === "error" ? "shake" : ""}
@@ -1077,8 +1107,10 @@ export default function RegistrationPage() {
                         }}
                         onClick={() => document.getElementById("phone-hidden-input")?.focus()}
                       >
-                        <div style={{ display: "flex", alignItems: "center", gap: "6px", padding: "0 16px", background: "#f3f4f6", borderRight: "1px solid #e5e7eb", color: "#374151", fontWeight: 700, fontSize: "15px", userSelect: "none", zIndex: 2 }}>
-                          <PhoneIcon style={{ position: "static", transform: "none", width: "16px", height: "16px", color: "var(--color-text-secondary)" }} />
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "0 14px 0 10px", background: "#fef3c7", borderRight: "1px solid #fde68a", color: "#b45309", fontWeight: 800, fontSize: "15px", userSelect: "none", zIndex: 2 }}>
+                          <div style={{ width: "34px", height: "34px", borderRadius: "10px", background: "linear-gradient(135deg, #f59e0b, #d97706)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 10px rgba(245, 158, 11, 0.35)", flexShrink: 0 }}>
+                            <PhoneIcon style={{ position: "static", transform: "none", width: "16px", height: "16px" }} />
+                          </div>
                           <span>+91</span>
                         </div>
 
@@ -1121,8 +1153,8 @@ export default function RegistrationPage() {
                     );
                   })()}
                   {fields.phone && !errors.phone && (
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "6px", fontSize: "12px", color: "var(--color-text-secondary)", animation: "fadeIn .2s ease" }}>
-                      <span style={{ display: "inline-block", width: "6px", height: "6px", borderRadius: "50%", background: "var(--color-success)" }} />
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "6px", fontSize: "12px", color: "#d97706", animation: "fadeIn .2s ease" }}>
+                      <span style={{ display: "inline-block", width: "6px", height: "6px", borderRadius: "50%", background: "#f59e0b" }} />
                       <span>Will be contacted at: <strong style={{ fontWeight: 600, color: "var(--color-text-primary)" }}>+91 {fields.phone.trim().replace(/^\+91\s*/i, "")}</strong></span>
                     </div>
                   )}
@@ -1133,11 +1165,14 @@ export default function RegistrationPage() {
 
                 {/* Address */}
                 <div className="input-group">
-                  <label className="input-label" htmlFor="address">
-                    Address <span>*</span>
+                  <label className="input-label" htmlFor="address" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span style={{ display: "inline-block", width: "10px", height: "10px", borderRadius: "50%", background: "#f43f5e", boxShadow: "0 0 8px rgba(244, 63, 94, 0.6)" }} />
+                    Address <span style={{ color: "var(--color-danger)" }}>*</span>
                   </label>
                   <div className="input-wrapper">
-                    <MapPinIcon />
+                    <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "linear-gradient(135deg, #f43f5e, #e11d48)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", position: "absolute", left: "10px", top: "12px", boxShadow: "0 4px 10px rgba(244, 63, 94, 0.35)", pointerEvents: "none", zIndex: 2 }}>
+                      <MapPinIcon style={{ width: "18px", height: "18px", position: "static", transform: "none" }} />
+                    </div>
                     {(() => {
                       const addressStatus = getFieldStatus("address", fields.address);
                       return (
@@ -1148,6 +1183,13 @@ export default function RegistrationPage() {
                           autoComplete="street-address"
                           placeholder="Enter your address"
                           className={`form-input form-textarea${addressStatus === "error" ? " error shake" : addressStatus === "success" ? " success" : ""}`}
+                          style={{
+                            paddingLeft: "58px",
+                            paddingTop: "16px",
+                            borderColor: addressStatus === "success" || fields.address ? "#f43f5e" : undefined,
+                            background: addressStatus === "error" ? "#fff5f5" : fields.address ? "#fff1f2" : undefined,
+                            boxShadow: fields.address && !addressStatus ? "0 0 0 3px rgba(244, 63, 94, 0.12)" : undefined,
+                          }}
                           value={fields.address}
                           onChange={handleChange}
                           onBlur={handleBlur}
@@ -1207,7 +1249,7 @@ export default function RegistrationPage() {
                         flex: 2,
                         minHeight: "54px",
                         padding: "14px 18px",
-                        background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                        background: "linear-gradient(135deg, #10b981 0%, #06b6d4 50%, #059669 100%)",
                         color: "#fff",
                         border: "none",
                         borderRadius: "12px",
@@ -1218,7 +1260,7 @@ export default function RegistrationPage() {
                         alignItems: "center",
                         justifyContent: "center",
                         gap: "8px",
-                        boxShadow: "0 4px 14px rgba(16, 185, 129, 0.3)",
+                        boxShadow: "0 6px 18px rgba(16, 185, 129, 0.35), 0 2px 8px rgba(6, 182, 212, 0.2)",
                       }}
                     >
                       {loading ? (
