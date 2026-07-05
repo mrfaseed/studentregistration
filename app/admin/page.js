@@ -176,7 +176,7 @@ function LockScreen({ onUnlock }) {
   return (
     <div style={{
       minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center",
-      background: "#f4f6fb", fontFamily: "var(--font-inter), sans-serif", padding: "24px",
+      background: "#f4f6f8", fontFamily: "var(--font-inter), sans-serif", padding: "24px",
     }}>
       <div style={{ width: "100%", maxWidth: "360px" }}>
 
@@ -190,7 +190,7 @@ function LockScreen({ onUnlock }) {
           overflow: "hidden",
         }}>
           {/* Top bar accent */}
-          <div style={{ height: "3px", background: "#4f46e5", borderRadius: "3px", marginBottom: "24px" }}/>
+          <div style={{ height: "3px", background: "#059669", borderRadius: "3px", marginBottom: "24px" }}/>
 
           {/* Identity row — shown only in password-only mode */}
           {step === "password-only" && (
@@ -223,7 +223,7 @@ function LockScreen({ onUnlock }) {
                     placeholder="Enter your gmail" value={gmail}
                     onChange={(e) => { setGmail(e.target.value); setErr(""); }}
                     style={{ ...inputStyle, padding: "9px 12px 9px 34px" }}
-                    onFocus={e => { e.target.style.borderColor = "#4f46e5"; e.target.style.boxShadow = "0 0 0 3px rgba(79,70,229,.1)"; }}
+                    onFocus={e => { e.target.style.borderColor = "#059669"; e.target.style.boxShadow = "0 0 0 3px rgba(5,150,105,.15)"; }}
                     onBlur={e => { e.target.style.borderColor = "#d1d5db"; e.target.style.boxShadow = "none"; }}
                   />
                 </div>
@@ -243,7 +243,7 @@ function LockScreen({ onUnlock }) {
                   placeholder="••••••••" value={pwd}
                   onChange={(e) => { setPwd(e.target.value); setErr(""); }}
                   style={{ ...inputStyle, padding: "9px 34px 9px 34px" }}
-                  onFocus={e => { e.target.style.borderColor = "#4f46e5"; e.target.style.boxShadow = "0 0 0 3px rgba(79,70,229,.1)"; }}
+                  onFocus={e => { e.target.style.borderColor = "#059669"; e.target.style.boxShadow = "0 0 0 3px rgba(5,150,105,.15)"; }}
                   onBlur={e => { e.target.style.borderColor = "#d1d5db"; e.target.style.boxShadow = "none"; }}
                 />
                 <button type="button" onClick={() => setShowPwd(p => !p)}
@@ -267,7 +267,7 @@ function LockScreen({ onUnlock }) {
             {/* Submit */}
             <button type="submit" id="admin-login-btn" disabled={loading}
               style={{
-                width: "100%", padding: "10px", background: "#4f46e5",
+                width: "100%", padding: "10px", background: "#059669",
                 color: "#fff", border: "none", borderRadius: "8px",
                 fontSize: "14px", fontWeight: 700, fontFamily: "inherit",
                 cursor: loading ? "not-allowed" : "pointer", opacity: loading ? .7 : 1,
@@ -282,7 +282,7 @@ function LockScreen({ onUnlock }) {
           {/* Footer */}
           <div style={{ marginTop: "14px", paddingTop: "13px", borderTop: "1px solid #f3f4f6", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             {step === "password-only" ? (
-              <button onClick={switchAccount} style={{ background: "none", border: "none", cursor: "pointer", color: "#4f46e5", fontWeight: 600, fontSize: "12.5px", fontFamily: "inherit", padding: 0 }}>
+              <button onClick={switchAccount} style={{ background: "none", border: "none", cursor: "pointer", color: "#059669", fontWeight: 600, fontSize: "12.5px", fontFamily: "inherit", padding: 0 }}>
                 Switch account
               </button>
             ) : (

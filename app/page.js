@@ -77,6 +77,19 @@ const LockIcon = () => (
   </svg>
 );
 
+const ShieldIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+  </svg>
+);
+
+const CloseIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18" />
+    <line x1="6" y1="6" x2="18" y2="18" />
+  </svg>
+);
+
 // ── Professional & Elegant White Theme Loading Screen ──
 function AppLoadingScreen() {
   return (
@@ -146,7 +159,7 @@ function AppLoadingScreen() {
         }}>
           <span style={{
             width: "6px", height: "6px", borderRadius: "50%",
-            background: "#3b82f6", display: "inline-block",
+            background: "#10b981", display: "inline-block",
             animation: "loadingPulseDot 1.5s infinite ease-in-out",
           }} />
           <span style={{
@@ -273,11 +286,12 @@ function AnimatedPhoneDisplay({ value, focused }) {
 
         </span>
       ) : (
-        displaySlots.map((item) => (
+        displaySlots.map((item, index) => (
           <span
             key={item.key}
             style={{
               display: "inline-block",
+              marginLeft: index === 5 ? "8px" : "0",
               animation: item.anim === "slide-up" ? "digitSlideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards" : item.anim === "slide-down" ? "digitSlideDown 0.22s cubic-bezier(0.7, 0, 0.84, 0) forwards" : "none",
               color: item.anim === "slide-down" ? "var(--color-danger)" : "inherit",
             }}
@@ -323,6 +337,198 @@ function validate(fields) {
   return errors;
 }
 
+// ── MD3 Confirmation Dialog ──────────────────────────────
+function ConfirmationDialog({ open, fields, loading, submitError, onEdit, onConfirm }) {
+  // Close on Escape key
+  useEffect(() => {
+    if (!open) return;
+    function handleKey(e) {
+      if (e.key === "Escape" && !loading) onEdit();
+    }
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [open, loading, onEdit]);
+
+  // Prevent body scroll when dialog is open
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [open]);
+
+  if (!open) return null;
+
+  const fullEmail = getFullEmail(fields);
+  const rows = [
+    { icon: <UserIcon className="" style={{ width: "18px", height: "18px", position: "static", transform: "none" }} />, bg: "#ecfdf5", color: "#059669", label: "Full Name", value: fields.name, mono: false },
+    { icon: <MailIcon className="" style={{ width: "18px", height: "18px", position: "static", transform: "none" }} />, bg: "#f0fdfa", color: "#0d9488", label: "Email Address", value: fullEmail, mono: false },
+    { icon: <PhoneIcon className="" style={{ width: "18px", height: "18px", position: "static", transform: "none" }} />, bg: "#f0fdf4", color: "#16a34a", label: "Mobile Number", value: `+91 ${fields.phone}`, mono: true },
+    { icon: <MapPinIcon className="" style={{ width: "18px", height: "18px", position: "static", transform: "none" }} />, bg: "#fef3c7", color: "#d97706", label: "Residential Address", value: fields.address, mono: false },
+  ];
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="dialog-title"
+      aria-describedby="dialog-desc"
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 10000,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "16px",
+        animation: "dialogBackdropIn 0.22s ease",
+      }}
+    >
+      {/* Blurred backdrop */}
+      <div
+        onClick={loading ? undefined : onEdit}
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: "rgba(15, 23, 42, 0.55)",
+          backdropFilter: "blur(8px)",
+          WebkitBackdropFilter: "blur(8px)",
+          cursor: loading ? "not-allowed" : "pointer",
+        }}
+      />
+
+      {/* Dialog surface */}
+      <div
+        style={{
+          position: "relative",
+          zIndex: 1,
+          width: "100%",
+          maxWidth: "480px",
+          background: "#ffffff",
+          borderRadius: "28px",
+          boxShadow: "0 24px 64px -8px rgba(15, 23, 42, 0.28), 0 8px 24px -4px rgba(15, 23, 42, 0.12)",
+          animation: "dialogIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1)",
+          overflow: "hidden",
+          fontFamily: "var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+        }}
+      >
+        {/* Header */}
+        <div style={{ padding: "28px 28px 0", display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+            <div style={{ width: "48px", height: "48px", borderRadius: "16px", background: "linear-gradient(135deg, #059669 0%, #0d9488 100%)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0, boxShadow: "0 4px 12px rgba(5, 150, 105, 0.3)" }}>
+              <ShieldIcon />
+            </div>
+            <div>
+              <h2 id="dialog-title" style={{ margin: 0, fontSize: "20px", fontWeight: 800, color: "#0f172a", letterSpacing: "-0.025em", lineHeight: 1.2 }}>
+                Review Your Information
+              </h2>
+              <p id="dialog-desc" style={{ margin: "4px 0 0", fontSize: "13px", color: "#64748b", lineHeight: 1.4 }}>
+                Please verify before final submission.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={loading ? undefined : onEdit}
+            disabled={loading}
+            aria-label="Close dialog and return to form"
+            style={{ background: "none", border: "none", cursor: loading ? "not-allowed" : "pointer", padding: "4px", color: "#94a3b8", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, opacity: loading ? 0.4 : 1 }}
+          >
+            <CloseIcon />
+          </button>
+        </div>
+
+        {/* Divider */}
+        <div style={{ margin: "20px 28px 0", height: "1px", background: "#f1f5f9" }} />
+
+        {/* Warning notice */}
+       
+
+        {/* Detail rows */}
+        <div style={{ padding: "16px 28px 0", display: "flex", flexDirection: "column", gap: "10px" }}>
+          {rows.map(({ icon, bg, color, label, value, mono }) => (
+            <div key={label} style={{ display: "flex", alignItems: "center", gap: "14px", background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "12px", padding: "12px 16px" }}>
+              <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: bg, color, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                {icon}
+              </div>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: "11px", fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "2px" }}>{label}</div>
+                <div style={{ fontSize: "14.5px", fontWeight: 700, color: "#0f172a", fontFamily: mono ? "monospace" : "inherit", letterSpacing: mono ? "0.5px" : "normal", wordBreak: "break-word" }}>{value}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Submit error */}
+        {submitError && (
+          <div style={{ margin: "12px 28px 0", display: "flex", alignItems: "center", gap: "6px", padding: "10px 14px", background: "#fff5f5", border: "1px solid #fecaca", borderRadius: "10px", fontSize: "13px", color: "#b91c1c", fontWeight: 600 }}>
+            <AlertIcon /> {submitError}
+          </div>
+        )}
+
+        {/* Actions */}
+        <div style={{ padding: "20px 28px 28px", display: "flex", gap: "12px", flexDirection: "column" }}>
+          {/* Confirm button */}
+          <button
+            onClick={onConfirm}
+            disabled={loading}
+            style={{
+              width: "100%",
+              minHeight: "52px",
+              padding: "14px 20px",
+              background: loading ? "#6ee7b7" : "linear-gradient(135deg, #059669 0%, #0d9488 100%)",
+              color: "#fff",
+              border: "none",
+              borderRadius: "14px",
+              fontSize: "15.5px",
+              fontWeight: 700,
+              cursor: loading ? "not-allowed" : "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px",
+              boxShadow: loading ? "none" : "0 6px 18px rgba(5, 150, 105, 0.35)",
+              transition: "all 0.2s ease",
+              letterSpacing: "-0.01em",
+            }}
+          >
+            {loading ? (
+              <><span className="spinner" style={{ borderColor: "rgba(255,255,255,0.35)", borderTopColor: "#fff" }} /> Submitting…</>
+            ) : (
+              <><CheckIcon size={18} /> Submit</>  
+            )}
+          </button>
+          {/* Edit button */}
+          <button
+            onClick={onEdit}
+            disabled={loading}
+            style={{
+              width: "100%",
+              minHeight: "48px",
+              padding: "13px 20px",
+              background: "#f8fafc",
+              color: loading ? "#94a3b8" : "#374151",
+              border: "1.5px solid #e2e8f0",
+              borderRadius: "14px",
+              fontSize: "15px",
+              fontWeight: 600,
+              cursor: loading ? "not-allowed" : "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px",
+              transition: "all 0.2s ease",
+            }}
+          >
+            <EditIcon /> Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Component ───────────────────────────────────────────
 export default function RegistrationPage() {
   const [fields, setFields] = useState({
@@ -335,6 +541,7 @@ export default function RegistrationPage() {
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
   const [submitted, setSubmitted] = useState(false);
+  const [isRegistered, setIsRegistered] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [hasEdited, setHasEdited] = useState(false);
   const [studentId, setStudentId] = useState(null);
@@ -345,6 +552,8 @@ export default function RegistrationPage() {
   const [updateSuccess, setUpdateSuccess] = useState(false);
   // App-init loading screen
   const [appLoading, setAppLoading] = useState(true);
+  // MD3 confirmation dialog
+  const [showReviewDialog, setShowReviewDialog] = useState(false);
 
   const addressRef = useRef(null);
 
@@ -367,6 +576,7 @@ export default function RegistrationPage() {
         setStudentId(savedId);
         populateFieldsFromData(parsed);
         setSubmitted(true);
+        setIsRegistered(true);
         if (savedEdited === "true" || parsed.hasEdited) {
           setHasEdited(true);
         }
@@ -402,31 +612,31 @@ export default function RegistrationPage() {
 
   function handleChange(e) {
     const { name, value } = e.target;
+    let formattedVal = value;
+    if (name === "name") {
+      // Auto-capitalize first letter of each word as user types
+      formattedVal = value.replace(/\b\w/g, (c) => c.toUpperCase());
+    }
     setFields((prev) => {
-      const next = { ...prev, [name]: value };
+      const next = { ...prev, [name]: formattedVal };
       const currentErrors = validate(next);
       setErrors(currentErrors);
       return next;
     });
-    setTouched((prev) => ({
-      ...prev,
-      [name]: true,
-      ...(name.startsWith("email") ? { email: true } : {}),
-    }));
     setSubmitError("");
   }
 
   function handlePhoneChange(e) {
     const raw = e.target.value.replace(/\D/g, "");
-    const cleanPhone = raw.slice(0, 10);
-    setFields((prev) => {
-      const next = { ...prev, phone: cleanPhone };
-      const currentErrors = validate(next);
-      setErrors(currentErrors);
-      return next;
-    });
-    setTouched((prev) => ({ ...prev, phone: true }));
-    setSubmitError("");
+    if (raw.length <= 10) {
+      setFields((prev) => {
+        const next = { ...prev, phone: raw };
+        const currentErrors = validate(next);
+        setErrors(currentErrors);
+        return next;
+      });
+      setSubmitError("");
+    }
   }
 
   function handleBlur(e) {
@@ -439,14 +649,36 @@ export default function RegistrationPage() {
     setErrors(validate(fields));
   }
 
+  // handleSubmit: validate then open confirmation dialog (initial reg)
+  // For edit mode it submits directly (keeps existing one-time-edit flow)
   async function handleSubmit(e) {
     e.preventDefault();
     setSubmitted(true);
     const validationErrors = validate(fields);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
+      const firstErrorField = Object.keys(validationErrors)[0];
+      const elementId = firstErrorField === "email" ? "emailUser" : firstErrorField === "phone" ? "phone-hidden-input" : firstErrorField;
+      const element = document.getElementById(elementId);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "center" });
+        setTimeout(() => element.focus({ preventScroll: true }), 300);
+      }
       return;
     }
+
+    if (isEditing) {
+      // Editing mode: submit directly (one-time edit, no dialog needed)
+      await handleConfirmSubmit();
+    } else {
+      // Initial registration: open confirmation dialog
+      setSubmitError("");
+      setShowReviewDialog(true);
+    }
+  }
+
+  // handleConfirmSubmit: the actual Firestore write (called from dialog or edit form)
+  async function handleConfirmSubmit() {
     setLoading(true);
     setSubmitError("");
     try {
@@ -473,6 +705,7 @@ export default function RegistrationPage() {
           email: "This Gmail address is already in use by another student.",
         }));
         setLoading(false);
+        setShowReviewDialog(false);
         return;
       }
 
@@ -483,12 +716,9 @@ export default function RegistrationPage() {
         address: fields.address.trim(),
       };
 
-      if (submitted && studentId) {
+      if (isEditing && studentId) {
         // One-time update of existing registration
-        const updatedData = {
-          ...docData,
-          hasEdited: true,
-        };
+        const updatedData = { ...docData, hasEdited: true };
         await updateDoc(doc(db, "students", studentId), {
           ...updatedData,
           updatedAt: serverTimestamp(),
@@ -497,21 +727,25 @@ export default function RegistrationPage() {
         localStorage.setItem("sr_registered_student_has_edited", "true");
         setHasEdited(true);
         setIsEditing(false);
+        setIsRegistered(true);
         setUpdateSuccess(true);
         setTimeout(() => setUpdateSuccess(false), 3500);
       } else {
         // Initial registration
         const docRef = await addDoc(collection(db, "students"), {
           ...docData,
-          hasEdited: false,
+          hasEdited: true,
           registeredAt: serverTimestamp(),
         });
         localStorage.setItem("sr_registered_student_id", docRef.id);
         localStorage.setItem("sr_registered_student_data", JSON.stringify(docData));
-        localStorage.setItem("sr_registered_student_has_edited", "false");
+        localStorage.setItem("sr_registered_student_has_edited", "true");
         setStudentId(docRef.id);
+        setHasEdited(true);
         setSubmitted(true);
+        setIsRegistered(true);
         setIsEditing(false);
+        setShowReviewDialog(false);
       }
     } catch (err) {
       console.error(err);
@@ -523,6 +757,15 @@ export default function RegistrationPage() {
 
   const hasAt = (fields.emailUser || "").includes("@");
   const liveEmail = getFullEmail(fields);
+
+  const currentValErrors = validate(fields);
+  const validCount = [
+    fields.name?.trim().length >= 2 && !currentValErrors.name,
+    fields.emailUser?.trim().length > 0 && !currentValErrors.email,
+    fields.phone?.trim().length === 10 && !currentValErrors.phone,
+    fields.address?.trim().length >= 10 && !currentValErrors.address,
+  ].filter(Boolean).length;
+  const progressPercent = Math.round((validCount / 4) * 100);
 
   function getFieldStatus(fieldName, val) {
     const isTouched = touched[fieldName] || submitted;
@@ -537,6 +780,15 @@ export default function RegistrationPage() {
 
   return (
     <>
+      {/* MD3 Confirmation Dialog */}
+      <ConfirmationDialog
+        open={showReviewDialog}
+        fields={fields}
+        loading={loading}
+        submitError={submitError}
+        onEdit={() => { if (!loading) setShowReviewDialog(false); }}
+        onConfirm={handleConfirmSubmit}
+      />
       {/* Navbar with properly aligned logo */}
       <nav className="navbar">
         <a href="/" className="navbar-brand">
@@ -548,7 +800,7 @@ export default function RegistrationPage() {
       {/* Main Section */}
       <main className="form-section" style={{ paddingTop: "64px", paddingBottom: "80px" }}>
         <div className="form-card">
-          {submitted && !isEditing ? (
+          {isRegistered && !isEditing ? (
             /* ── Read-Only Registered Student Dashboard / Finished Form ── */
             <div style={{ padding: "32px 36px" }}>
               {updateSuccess && (
@@ -558,39 +810,24 @@ export default function RegistrationPage() {
                 </div>
               )}
 
-              {/* Celebratory Finished Form Header (when confirmed/locked) */}
-              {hasEdited ? (
-                <div style={{ background: "linear-gradient(135deg, #10b981 0%, #059669 100%)", color: "#fff", borderRadius: "16px", padding: "24px 28px", textAlign: "center", marginBottom: "28px", boxShadow: "0 10px 25px rgba(16, 185, 129, 0.25)", position: "relative", overflow: "hidden", animation: "fadeInUp .4s ease" }}>
-                  <div style={{ width: "56px", height: "56px", borderRadius: "50%", background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px", backdropFilter: "blur(4px)" }}>
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                  </div>
-                  <h3 style={{ fontSize: "22px", fontWeight: 800, margin: "0 0 6px", letterSpacing: "-0.02em" }}>You Finished the Form!</h3>
-                  <p style={{ fontSize: "14px", opacity: 0.95, margin: 0, maxWidth: "420px", marginLeft: "auto", marginRight: "auto", lineHeight: "1.5" }}>
-                    Your registration has been Done
-                  </p>
+              {/* Celebratory Finished Form Header */}
+              <div style={{ background: "linear-gradient(135deg, #10b981 0%, #059669 100%)", color: "#fff", borderRadius: "16px", padding: "24px 28px", textAlign: "center", marginBottom: "28px", boxShadow: "0 10px 25px rgba(5, 150, 105, 0.25)", position: "relative", overflow: "hidden", animation: "fadeInUp .4s ease" }}>
+                <div style={{ width: "56px", height: "56px", borderRadius: "50%", background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px", backdropFilter: "blur(4px)" }}>
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
                 </div>
-              ) : (
-                /* Standard Student Header before confirmation */
-                <div style={{ display: "flex", alignItems: "center", gap: "18px", marginBottom: "28px", paddingBottom: "22px", borderBottom: "1px solid #e5e7eb" }}>
-                  <div style={{ width: "60px", height: "60px", borderRadius: "16px", background: "linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: "22px", fontWeight: 800, boxShadow: "0 6px 16px rgba(79, 70, 229, 0.2)", flexShrink: 0 }}>
-                    {getInitials(fields.name)}
-                  </div>
-                  <div>
-                    <h2 style={{ fontSize: "22px", fontWeight: 800, color: "#111827", letterSpacing: "-0.02em", margin: 0 }}>{fields.name}</h2>
-                    <p style={{ fontSize: "13.5px", color: "#6b7280", marginTop: "4px", margin: 0 }}>
-                      Please review your submitted registration details below
-                    </p>
-                  </div>
-                </div>
-              )}
+                <h3 style={{ fontSize: "22px", fontWeight: 800, margin: "0 0 6px", letterSpacing: "-0.02em" }}>You Finished the Form!</h3>
+                <p style={{ fontSize: "14px", opacity: 0.95, margin: 0, maxWidth: "420px", marginLeft: "auto", marginRight: "auto", lineHeight: "1.5" }}>
+                  Your registration has been Done
+                </p>
+              </div>
 
               {/* Details Grid (icons explicitly set to static to prevent floating outside) */}
               <div style={{ display: "flex", flexDirection: "column", gap: "14px", marginBottom: "28px" }}>
-                <div style={{ background: "#f8faff", border: "1px solid #e5e7eb", borderRadius: "12px", padding: "15px 18px", display: "flex", alignItems: "center", justify: "space-between" }}>
+                <div style={{ background: "#f8fafc", border: "1px solid #e5e7eb", borderRadius: "12px", padding: "15px 18px", display: "flex", alignItems: "center", justify: "space-between" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-                    <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "#eef2ff", color: "#4f46e5", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "#ecfdf5", color: "#059669", display: "flex", alignItems: "center", justifyContent: "center" }}>
                       <UserIcon className="" style={{ width: "18px", height: "18px", position: "static", transform: "none" }} />
                     </div>
                     <div>
@@ -600,9 +837,9 @@ export default function RegistrationPage() {
                   </div>
                 </div>
 
-                <div style={{ background: "#f8faff", border: "1px solid #e5e7eb", borderRadius: "12px", padding: "15px 18px", display: "flex", alignItems: "center", justify: "space-between" }}>
+                <div style={{ background: "#f8fafc", border: "1px solid #e5e7eb", borderRadius: "12px", padding: "15px 18px", display: "flex", alignItems: "center", justify: "space-between" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-                    <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "#ecfeff", color: "#0891b2", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "#f0fdfa", color: "#0d9488", display: "flex", alignItems: "center", justifyContent: "center" }}>
                       <MailIcon className="" style={{ width: "18px", height: "18px", position: "static", transform: "none" }} />
                     </div>
                     <div>
@@ -612,7 +849,7 @@ export default function RegistrationPage() {
                   </div>
                 </div>
 
-                <div style={{ background: "#f8faff", border: "1px solid #e5e7eb", borderRadius: "12px", padding: "15px 18px", display: "flex", alignItems: "center", justify: "space-between" }}>
+                <div style={{ background: "#f8fafc", border: "1px solid #e5e7eb", borderRadius: "12px", padding: "15px 18px", display: "flex", alignItems: "center", justify: "space-between" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
                     <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "#f0fdf4", color: "#16a34a", display: "flex", alignItems: "center", justifyContent: "center" }}>
                       <PhoneIcon className="" style={{ width: "18px", height: "18px", position: "static", transform: "none" }} />
@@ -624,7 +861,7 @@ export default function RegistrationPage() {
                   </div>
                 </div>
 
-                <div style={{ background: "#f8faff", border: "1px solid #e5e7eb", borderRadius: "12px", padding: "15px 18px", display: "flex", alignItems: "center", justify: "space-between" }}>
+                <div style={{ background: "#f8fafc", border: "1px solid #e5e7eb", borderRadius: "12px", padding: "15px 18px", display: "flex", alignItems: "center", justify: "space-between" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
                     <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "#fef3c7", color: "#d97706", display: "flex", alignItems: "center", justifyContent: "center" }}>
                       <MapPinIcon className="" style={{ width: "18px", height: "18px", position: "static", transform: "none" }} />
@@ -637,73 +874,11 @@ export default function RegistrationPage() {
                 </div>
               </div>
 
-              {/* Confirm or Edit Buttons / Locked Notice */}
-              {hasEdited ? (
-                <div style={{ background: "#f3f4f6", border: "1px solid #e5e7eb", borderRadius: "12px", padding: "14px 18px", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", color: "#4b5563", fontSize: "14px", fontWeight: 600, textAlign: "center" }}>
-                  <LockIcon />
-                  <span>Registration Completed</span>
-                </div>
-              ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                  <button
-                    onClick={() => {
-                      if (studentId) {
-                        updateDoc(doc(db, "students", studentId), {
-                          hasEdited: true,
-                          confirmedAt: serverTimestamp(),
-                        }).catch(console.error);
-                      }
-                      localStorage.setItem("sr_registered_student_has_edited", "true");
-                      setHasEdited(true);
-                    }}
-                    style={{
-                      width: "100%",
-                      padding: "16px 20px",
-                      background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
-                      color: "#fff",
-                      border: "none",
-                      borderRadius: "12px",
-                      fontSize: "16px",
-                      fontWeight: 800,
-                      cursor: "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: "10px",
-                      boxShadow: "0 6px 18px rgba(16, 185, 129, 0.35)",
-                      transition: "all 0.2s ease",
-                    }}
-                  >
-                    <CheckIcon size={20} />
-                    Confirm Registration Details
-                  </button>
-
-                  <button
-                    onClick={() => setIsEditing(true)}
-                    style={{
-                      width: "100%",
-                      padding: "14px 20px",
-                      background: "#f3f4f6",
-                      color: "#374151",
-                      border: "1px solid #d1d5db",
-                      borderRadius: "12px",
-                      fontSize: "14.5px",
-                      fontWeight: 700,
-                      cursor: "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: "8px",
-                      transition: "all 0.2s ease",
-                    }}
-                  >
-                    <EditIcon /> Edit Registration Details (1 Edit Allowed)
-                  </button>
-                  <p style={{ fontSize: "12.5px", color: "#6b7280", textAlign: "center", marginTop: "4px", marginBottom: 0 }}>
-                    Click confirm to lock your registration, or edit your information if anything is incorrect.
-                  </p>
-                </div>
-              )}
+              {/* Locked Notice */}
+              <div style={{ background: "#f3f4f6", border: "1px solid #e5e7eb", borderRadius: "12px", padding: "14px 18px", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", color: "#4b5563", fontSize: "14px", fontWeight: 600, textAlign: "center" }}>
+                <LockIcon />
+                <span>Registration Completed</span>
+              </div>
             </div>
           ) : (
             /* ── Registration / Editing Form ── */
@@ -714,6 +889,23 @@ export default function RegistrationPage() {
                   {isEditing && <WarningIcon />}
                   {isEditing ? "Note: You can only update and confirm your details once." : "Fill in the details below to complete your registration."}
                 </p>
+                <div style={{ marginTop: "18px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "13px", fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: "8px" }}>
+                    <span>Registration Progress</span>
+                    <span style={{ color: progressPercent === 100 ? "var(--color-success)" : "var(--color-primary)", transition: "color 0.3s ease" }}>{progressPercent}%</span>
+                  </div>
+                  <div style={{ height: "6px", width: "100%", background: "#e2e8f0", borderRadius: "999px", overflow: "hidden" }}>
+                    <div
+                      style={{
+                        height: "100%",
+                        width: `${progressPercent}%`,
+                        background: progressPercent === 100 ? "linear-gradient(90deg, #10b981, #059669)" : "linear-gradient(90deg, #34d399, #059669)",
+                        transition: "width 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.4s ease",
+                        borderRadius: "999px",
+                      }}
+                    />
+                  </div>
+                </div>
               </div>
               <form className="form-body" onSubmit={handleSubmit} noValidate>
                 {/* Name */}
@@ -732,10 +924,17 @@ export default function RegistrationPage() {
                           type="text"
                           autoComplete="name"
                           placeholder="Enter Your Name"
-                          className={`form-input${nameStatus === "error" ? " error" : nameStatus === "success" ? " success" : ""}`}
+                          className={`form-input${nameStatus === "error" ? " error shake" : nameStatus === "success" ? " success" : ""}`}
                           value={fields.name}
                           onChange={handleChange}
                           onBlur={handleBlur}
+                          enterKeyHint="next"
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              document.getElementById("emailUser")?.focus();
+                            }
+                          }}
                         />
                       );
                     })()}
@@ -754,9 +953,10 @@ export default function RegistrationPage() {
                     const emailStatus = getFieldStatus("email", fields.emailUser);
                     const emailBorder = emailStatus === "error" ? "var(--color-danger)" : emailStatus === "success" ? "var(--color-success)" : emailFocused ? "var(--color-primary)" : "var(--color-border)";
                     const emailBg = emailStatus === "error" ? "#fff5f5" : emailStatus === "success" ? "#f0fdf4" : emailFocused ? "#fff" : "var(--color-bg)";
-                    const emailShadow = emailStatus === "error" && emailFocused ? "0 0 0 3px rgba(239, 68, 68, .12)" : emailStatus === "success" && emailFocused ? "0 0 0 3px rgba(16, 185, 129, .15)" : emailFocused ? "0 0 0 3px rgba(99,102,241,.12)" : "none";
+                    const emailShadow = emailStatus === "error" && emailFocused ? "0 0 0 3px rgba(239, 68, 68, .12)" : emailStatus === "success" && emailFocused ? "0 0 0 3px rgba(16, 185, 129, .15)" : emailFocused ? "0 0 0 3px rgba(16, 185, 129, .15)" : "none";
                     return (
                       <div
+                        className={emailStatus === "error" ? "shake" : ""}
                         style={{
                           display: "flex",
                           alignItems: "stretch",
@@ -797,6 +997,13 @@ export default function RegistrationPage() {
                           onBlur={(e) => {
                             setEmailFocused(false);
                             handleBlur(e);
+                          }}
+                          enterKeyHint="next"
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              document.getElementById("phone-hidden-input")?.focus();
+                            }
                           }}
                         />
                         <div
@@ -851,9 +1058,10 @@ export default function RegistrationPage() {
                     const phoneStatus = getFieldStatus("phone", fields.phone);
                     const phoneBorder = phoneStatus === "error" ? "var(--color-danger)" : phoneStatus === "success" ? "var(--color-success)" : phoneFocused ? "var(--color-primary)" : "var(--color-border)";
                     const phoneBg = phoneStatus === "error" ? "#fff5f5" : phoneStatus === "success" ? "#f0fdf4" : phoneFocused ? "#fff" : "var(--color-bg)";
-                    const phoneShadow = phoneStatus === "error" && phoneFocused ? "0 0 0 3px rgba(239, 68, 68, .12)" : phoneStatus === "success" && phoneFocused ? "0 0 0 3px rgba(16, 185, 129, .15)" : phoneFocused ? "0 0 0 3px rgba(99,102,241,.12)" : "none";
+                    const phoneShadow = phoneStatus === "error" && phoneFocused ? "0 0 0 3px rgba(239, 68, 68, .12)" : phoneStatus === "success" && phoneFocused ? "0 0 0 3px rgba(16, 185, 129, .15)" : phoneFocused ? "0 0 0 3px rgba(16, 185, 129, .15)" : "none";
                     return (
                       <div
+                        className={phoneStatus === "error" ? "shake" : ""}
                         style={{
                           display: "flex",
                           alignItems: "stretch",
@@ -891,6 +1099,13 @@ export default function RegistrationPage() {
                           onBlur={(e) => {
                             setPhoneFocused(false);
                             handleBlur(e);
+                          }}
+                          enterKeyHint="next"
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              document.getElementById("address")?.focus();
+                            }
                           }}
                           style={{
                             position: "absolute",
@@ -932,10 +1147,11 @@ export default function RegistrationPage() {
                           name="address"
                           autoComplete="street-address"
                           placeholder="Enter your address"
-                          className={`form-input form-textarea${addressStatus === "error" ? " error" : addressStatus === "success" ? " success" : ""}`}
+                          className={`form-input form-textarea${addressStatus === "error" ? " error shake" : addressStatus === "success" ? " success" : ""}`}
                           value={fields.address}
                           onChange={handleChange}
                           onBlur={handleBlur}
+                          enterKeyHint="done"
                           rows={2}
                         />
                       );
@@ -951,7 +1167,6 @@ export default function RegistrationPage() {
                     <AlertIcon /> {submitError}
                   </p>
                 )}
-
                 {isEditing ? (
                   <div style={{ display: "flex", gap: "12px", marginTop: "10px" }}>
                     <button
@@ -1038,24 +1253,12 @@ export default function RegistrationPage() {
           to   { opacity: 1; }
         }
         @keyframes digitSlideUp {
-          0% {
-            transform: translateY(14px);
-            opacity: 0;
-          }
-          100% {
-            transform: translateY(0);
-            opacity: 1;
-          }
+          0% { transform: translateY(14px); opacity: 0; }
+          100% { transform: translateY(0); opacity: 1; }
         }
         @keyframes digitSlideDown {
-          0% {
-            transform: translateY(0);
-            opacity: 1;
-          }
-          100% {
-            transform: translateY(14px);
-            opacity: 0;
-          }
+          0% { transform: translateY(0); opacity: 1; }
+          100% { transform: translateY(14px); opacity: 0; }
         }
         @keyframes blink {
           0%, 100% { opacity: 1; }
@@ -1064,6 +1267,14 @@ export default function RegistrationPage() {
         @keyframes pulse {
           0%, 100% { opacity: 1; }
           50% { opacity: 0.4; }
+        }
+        @keyframes dialogBackdropIn {
+          from { opacity: 0; }
+          to   { opacity: 1; }
+        }
+        @keyframes dialogIn {
+          from { opacity: 0; transform: scale(0.88) translateY(12px); }
+          to   { opacity: 1; transform: scale(1) translateY(0); }
         }
       `}</style>
     </>
